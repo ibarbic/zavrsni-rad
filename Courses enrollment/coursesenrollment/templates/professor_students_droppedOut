@@ -1,0 +1,33 @@
+{% extends "professor" %}
+
+{% block professor_content %}
+    <div id="user-menu">
+        <ul>
+            <li><a class="user-menu-default" href="{%url 'professor_courses' %}">Predmeti</a></li>
+        </ul>
+    </div>
+    <div class="user-list-container">
+        {% block professor_students_content %}
+
+        <div class="user-list-menu">
+            <p>Lista studenata ispisanih:</p>
+        </div>
+        <div class="user-list">
+            <table>
+                <tr>
+                    <th>Student</th>
+                    <th>Status</th>
+                </tr>
+                {% for user in users %}
+                    {% if user.role.name == "Student" %}
+                        <tr>
+                            <td><a id="user" href="{% url 'student' user.id %}"><p>{{ user.email }}</p></a></td>
+                            <td><p>{{ user.status }}</p></td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            </table>
+        </div>
+        {% endblock %}
+    </div>
+{% endblock professor_content %}

@@ -1,0 +1,19 @@
+{% extends "base" %}
+
+
+
+{% block content %}
+<body class="post-body">
+    <table>
+        {% for post in posts %}
+            <tr>
+                <div class="posts-body" role="heading" aria-level="2" id="posts-body">{{ post.title }}</div>
+                <td><p>{{ post.title }}</p></td>
+                <td><p>{{ post.content }}</p></td>
+            </tr>
+      
+        {% endfor %}
+    </table>
+</body>
+{% endblock %}
+

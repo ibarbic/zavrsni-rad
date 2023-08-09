@@ -1,0 +1,49 @@
+{% extends "admin" %}
+
+{% block professor_content %}
+{% load static %}
+    <div id="user-menu">
+        <ul>
+            <li><a  class="user-menu-default" href="{%url 'admin_students' %}">Studenti</a></li>
+            <li><a  class="user-menu-selected" href="{%url 'admin_courses' %}">Predmeti</a></li>
+            <li><a class="user-menu-default" href="{%url 'admin_professors' %}">Profesori</a></li>
+        </ul>
+    </div>
+    <div class="proffessor-courses-container">
+        <div id="add-subject-container">
+            <a class="user-menu-default" href="{%url 'admin_courses_add' %}">+ Dodaj novi predmet</a>
+        </div>
+        
+        <div class="user-courses-list">
+            <form method="POST">
+                {% csrf_token %}
+                <table>
+                {% for course in courses %}
+                    <tr>
+                        <td><p>{{ course.code }}</p></td>
+                        <td><a id="predmet" href="{% url 'admin_posts' course.id %}"><p>{{ course.name }}</p></a></td>
+                        <td>
+                            <button type='submit' class='add-btn' name="{{ course }}" value='edit'>
+                                <img src="{% static 'edit_icon.png' %}" width="11px" height="11px">
+                            </button>
+                        </td>
+                        <td>
+                            <button type='submit' class='add-btn' name="{{ course }}" value='delete'>
+                                <img src="{% static 'delete_icon.png' %}" width="11px" height="11px">
+                            </button>
+                        </td>
+                        
+                        <td>
+                            <div id="list-students-container">
+                                <a class="user-menu-default" href="{%url 'admin_courses_students' course.id %}">Popis studenata</a>
+                            </div>
+                        </td>
+                    </tr>
+                {% endfor %}
+                </table>
+            </form>
+        </div>
+    </div>
+
+    
+{% endblock professor_content %}
