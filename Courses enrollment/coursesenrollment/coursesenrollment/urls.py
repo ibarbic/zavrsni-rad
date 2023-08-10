@@ -1,8 +1,11 @@
 
 from django.contrib import admin
-from django.urls import path
+from django.urls import path, include
 from university.views import home
 from users.views import *
+from django.conf import settings
+from django.conf.urls.static import static
+
 urlpatterns = [
     #path('admin/', admin.site.urls),
     path('admin/', admin_view, name='admin'),
@@ -32,5 +35,6 @@ urlpatterns = [
     path('professor_students_droppedOut/<int:pk>/',professor_students_droppedOut_view, name='professor_students_droppedOut'),
     path('admin_posts/<int:pk>', admin_posts_view, name='admin_posts'),
     path('admin_posts_edit/<int:pk>/', admin_posts_edit_view, name='admin_posts_edit'),
-    
-]
+    path('admin_posts_add/<int:pk>', admin_posts_add_view, name='admin_posts_add'),
+    path('ckeditor/', include('ckeditor_uploader.urls')),
+]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

@@ -606,23 +606,43 @@ def admin_courses_edit_view(request, pk):
 
     return render(request, 'admin_courses_edit', context)
 
+# def admin_posts_view(request, pk):
+#     posts = Post.objects.filter(course = pk)
+#     print(posts)
+#     return render(request, 'admin_posts', {'posts': posts, })
+@login_required
 def admin_posts_view(request, pk):
-    posts = Post.objects.filter(course = pk)
-    print(posts)
-    return render(request, 'admin_posts', {'posts': posts, })
+    if request.user.role.name != "Admin":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    
+    posts = Post.objects.filter(course=pk)
+    if request.POST:
+        for post in posts:
+            print(post)
+            if request.POST.get(str(post)) == 'delete':
+                messages.success(request, "Izbrisano: " + str(post.title))
+                post.delete()
+                return HttpResponseRedirect(reverse('admin_posts', args= pk,))
+            elif request.POST.get(str(post)) == 'edit':
+                return HttpResponseRedirect(reverse('admin_posts_edit', args=(post.pk,)))
+    context = {
+        'posts': posts,
+    }
+    return render(request, 'admin_posts', context)
+
 
 def admin_posts_edit_view(request, pk):
     if request.user.role.name != "Admin":
         return HttpResponseRedirect(reverse('home'))
     post = Post.objects.get(pk = pk)
-    print(post)
     context = {}
     if request.method == 'POST':
         form = PostForm(request.POST, instance=post)
         if form.is_valid():
             form.save()
             messages.success(request, f'Post has been edited!')
-            return HttpResponseRedirect(reverse('admin_courses'))
+            return HttpResponseRedirect(reverse('admin_posts', args=(post.course.pk,)))
         else:
             context['post_edit_form'] = form
     else:
@@ -634,20 +654,22 @@ def admin_posts_edit_view(request, pk):
     return render(request, 'admin_post_edit', context)
 
 @login_required
-def admin_posts_add_view(request, pk):
+def admin_posts_add_view(request,pk):
     if request.user.role.name != "Admin":
         return HttpResponseRedirect(reverse('home'))
     context = {}
     if request.method == 'POST':
-        form = PostForm(request.POST,pk)
+        form = PostForm(request.POST)
         if form.is_valid():
-            form.save()
+            tempform = form.save(commit=False)
+            tempform.user = request.user
+            tempform.save()
             messages.success(request, f'Post has been created!')
-            return HttpResponseRedirect(reverse('professor_students'))
+            return HttpResponseRedirect(reverse('admin_courses'))
         else:
             context['post_add_form'] = form
     else:
-        form = StudentForm()
+        form = PostForm()
         context['post_add_form'] = form
     context['title'] = str(request.user.email)
 

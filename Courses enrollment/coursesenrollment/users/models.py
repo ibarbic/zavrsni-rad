@@ -11,6 +11,7 @@ from django.contrib.auth.models import AbstractBaseUser
 from .managers import UserManager
 from django.contrib import admin
 from django.core.validators import MaxValueValidator, MinValueValidator
+from ckeditor.fields import RichTextField
 class Role(models.Model):
     name = models.CharField(max_length=50)
 
@@ -99,12 +100,20 @@ class Post(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE,null=True)
     title = models.CharField(max_length=128, default="Title")
-    content = models.CharField(max_length=9999, default="")
+    #content = models.CharField(max_length=9999, default="")
+    content = RichTextField()
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
     
     class Meta:
         db_table = "posts"
 
-
+# class Comment(models.Model):
+#     post = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
+#     content = models.CharField(max_length=9999, default="")
+#     created_on = models.DateTimeField(auto_now_add=True)
+#     updated_on = models.DateTimeField(auto_now=True)
+    
+#     class Meta:
+#         db_table = "comments"
         

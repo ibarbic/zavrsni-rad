@@ -3,17 +3,34 @@
 
 
 {% block content %}
+{% load static %}
 <body class="post-body">
-    <table>
-        {% for post in posts %}
-            <tr>
-                <div class="posts-body" role="heading" aria-level="2" id="posts-body">{{ post.title }}</div>
-                <td><p>{{ post.title }}</p></td>
-                <td><p>{{ post.content }}</p></td>
-            </tr>
+    <td><a id="predmet" href="{% url 'admin_posts_add' 2 %}"><p>Dodaj post</p></a></td>
+    <form method="POST">
+    {% csrf_token %}
+        <table>
+            {% for post in posts %}
+                <tr>
+                    <div class="posts-body" role="heading" aria-level="2" id="posts-body">{{ post.title }}</div>
+                    <td><p>{{ post.title }}</p></td>
+                    <td>{{ post.content|safe}}</td>
+                    <td>{{ post.user.firt_name}}</td>
+                    <td>{{ post.user.surname}}</td>
+                    <td>
+                        <button type='submit' class='add-btn' name="{{ post }}" value='edit'>
+                            <img src="{% static 'edit_icon.png' %}" width="11px" height="11px">
+                        </button>
+                    </td>
+                    <td>
+                        <button type='submit' class='add-btn' name="{{ post }}" value='delete'>
+                            <img src="{% static 'delete_icon.png' %}" width="11px" height="11px">
+                        </button>
+                    </td>
+                </tr>
       
-        {% endfor %}
-    </table>
+            {% endfor %}
+        </table>
+    </form>     
 </body>
 {% endblock %}
 

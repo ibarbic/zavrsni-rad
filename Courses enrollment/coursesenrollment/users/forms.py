@@ -2,7 +2,7 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth import authenticate, views
 from .models import CustomUser, Enrollment, Course, Role, Post
-
+from ckeditor.widgets import CKEditorWidget
 
 class UserRegisterForm(UserCreationForm):
     STATUS_CHOICES = [
@@ -95,8 +95,9 @@ class CourseModelChoiceField(forms.ModelChoiceField):
            
 class PostForm(forms.ModelForm):
     title = forms.CharField(max_length=64, label= "Naslov")
-    content = forms.CharField(label="Sadrzaj")
+    content = forms.CharField(label="Sadrzaj", widget=CKEditorWidget())
     course =  CourseModelChoiceField(queryset=Course.objects.all())
     class Meta:
         model = Post
-        fields = ['title', 'content',]
+        fields = ['title', 'content','course']
+        #widgets = {'content': RichTextFormField(config_name="default")}

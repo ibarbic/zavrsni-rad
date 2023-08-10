@@ -2,6 +2,7 @@
 
 {% block content %}
 {% load static %} 
+{% load crispy_forms_tags %}
     <div id="home-container">
         <h1>Home</h1>
         {% for user in users %}

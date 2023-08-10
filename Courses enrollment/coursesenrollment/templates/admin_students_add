@@ -1,12 +1,12 @@
 {% extends "professor" %}
 
 {% block professor_content %}
+
 <div class="back-link">
     <a href="{%url 'admin_courses' %}">Nazad na Predmete</a>
 </div>
 
 <h3>Dodaj novog korisnika:</h3>
-
 <form method="POST">
     {% csrf_token %}
     <fieldset class="form-group">

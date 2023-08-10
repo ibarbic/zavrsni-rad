@@ -9,6 +9,7 @@
 
 <form method="POST">
     {% csrf_token %}
+    {{course_add_form.media}}
     <fieldset class="form-group">
         {% for field in course_add_form %}
             <p>
