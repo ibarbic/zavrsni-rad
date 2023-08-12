@@ -33,8 +33,13 @@ urlpatterns = [
     path('professor_students_fail/<int:pk>/', professor_students_fail_view, name='professor_students_fail'),
     path('professor_students_pass/<int:pk>/',professor_students_pass_view, name='professor_students_pass'),
     path('professor_students_droppedOut/<int:pk>/',professor_students_droppedOut_view, name='professor_students_droppedOut'),
+    path('professor_posts/<int:pk>/', professor_posts_view, name='professor_posts'),
+    path('professor_posts_add/<int:pk>', professor_posts_add_view, name='professor_posts_add'),
+    path('professor_posts_edit/<int:pk>', professor_posts_edit_view, name='professor_posts_edit'),
     path('admin_posts/<int:pk>', admin_posts_view, name='admin_posts'),
     path('admin_posts_edit/<int:pk>/', admin_posts_edit_view, name='admin_posts_edit'),
     path('admin_posts_add/<int:pk>', admin_posts_add_view, name='admin_posts_add'),
+    path('student_posts/<int:pk>', student_posts_view, name='student_posts'),
+    path('student_courses/', student_courses_view, name='student_courses'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

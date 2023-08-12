@@ -78,6 +78,7 @@ class Course(models.Model):
         db_table = 'courses'
 
 
+
 class Enrollment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)

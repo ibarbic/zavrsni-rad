@@ -1,0 +1,24 @@
+{% extends "student" %}
+{% block content %}
+{% load static %}
+<body class="post-body">
+    <form method="POST">
+    {% csrf_token %}
+        {% for post in posts %}
+            <section class="u-align-center u-clearfix u-section-1" id="carousel_b3c5">
+                <div class="u-clearfix u-sheet u-sheet-1"><!--blog--><!--blog_options_json--><!--{"type":"Recent","source":"","tags":"","count":""}--><!--/blog_options_json-->
+                    <div class="u-blog u-blog-1">
+                        <div class="u-repeater u-repeater-1"><!--blog_post-->
+                            <div class="u-blog-post u-repeater-item">
+                                <h2 class="u-blog-control u-text u-text-1"><a class="u-post-header-link">{{post.title}}</a></h2>
+                            <div class="u-blog-control u-post-content u-text u-text-2 fr-view">{{post.content|safe}}</div>
+                            <div class="u-blog-control u-metadata u-metadata-1"><span class="u-meta-date u-meta-icon">{{post.user.first_name}}  {{post.user.surname}}</span></div>
+                        </div>
+                    </div>
+                </div>
+            </section> 
+        {% endfor %}
+    </form>     
+</body>
+{% endblock %}
+

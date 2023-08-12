@@ -101,3 +101,18 @@ class PostForm(forms.ModelForm):
         model = Post
         fields = ['title', 'content','course']
         #widgets = {'content': RichTextFormField(config_name="default")}
+
+class ProfessorPostForm(forms.ModelForm):
+    def __init__(self, *args, **kwargs):
+        self.request = kwargs.pop("request")
+        super(ProfessorPostForm, self).__init__(*args, **kwargs)
+        self.fields['course'].queryset = Course.objects.filter(professor =self.request.user)
+   
+    
+    title = forms.CharField(max_length=64, label= "Naslov")
+    content = forms.CharField(label="Sadrzaj", widget=CKEditorWidget())
+    course =  CourseModelChoiceField(queryset=Course.objects.all())
+    class Meta:
+        model = Post
+        fields = ['title', 'content','course']
+        #widgets = {'content': RichTextFormField(config_name="default")}

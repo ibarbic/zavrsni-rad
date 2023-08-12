@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, TemplateView, UpdateView
 from .models import CustomUser, Course, Enrollment,Post
-from .forms import StudentForm, UserRegisterForm, UserAuthenticationForm, CourseForm, PostForm
+from .forms import StudentForm, UserRegisterForm, UserAuthenticationForm, CourseForm, PostForm, ProfessorPostForm
 
 def home_view(request):
     user = request.user      
@@ -674,3 +674,102 @@ def admin_posts_add_view(request,pk):
     context['title'] = str(request.user.email)
 
     return render(request, 'admin_posts_add', context)
+
+@login_required
+def professor_posts_view(request, pk):
+    if request.user.role.name != "Professor":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    course = Course.objects.filter(pk=pk)
+    posts = Post.objects.filter(course=pk)
+    if request.POST:
+        if(course[0].professor.pk == request.user.pk):
+            for post in posts:
+            
+                if request.POST.get(str(post)) == 'delete':
+                    messages.success(request, "Izbrisano: " + str(post.title))
+                    post.delete()
+                    return HttpResponseRedirect(reverse('admin_posts', args= pk,))
+                elif request.POST.get(str(post)) == 'edit':
+                    return HttpResponseRedirect(reverse('admin_posts_edit', args=(post.pk,)))
+    context = {
+        'posts': posts,
+        'professor' : course[0].professor,
+        'user' : request.user,
+    }
+    return render(request, 'professor_posts', context)
+
+
+def professor_posts_edit_view(request, pk):
+    if request.user.role.name != "Professor":
+        return HttpResponseRedirect(reverse('home'))
+    post = Post.objects.get(pk = pk)
+    context = {}
+    if request.method == 'POST':
+        form = ProfessorPostForm(request.POST, instance=post, request=request)
+        print("aaaa")
+        if form.is_valid():
+            
+            form.save()
+            messages.success(request, f'Post has been edited!')
+            return HttpResponseRedirect(reverse('professor_posts', args=(post.course.pk,)))
+        else:
+            context['post_edit_form'] = form
+    else:
+        form = ProfessorPostForm(instance=post,request=request)
+        context['post_edit_form'] = form
+        
+    context['post'] = post
+    context['title'] = post.title
+    return render(request, 'professor_post_edit', context)
+
+@login_required
+def professor_posts_add_view(request,pk):
+    if request.user.role.name != "Professor":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    if request.method == 'POST':
+        form = ProfessorPostForm(request.POST)
+        if form.is_valid():
+            tempform = form.save(commit=False)
+            tempform.user = request.user
+            tempform.save()
+            messages.success(request, f'Post has been created!')
+            return HttpResponseRedirect(reverse('professor_courses'))
+        else:
+            context['post_add_form'] = form
+    else:
+        form = ProfessorPostForm(request=request)
+        context['post_add_form'] = form
+    context['title'] = str(request.user.email)
+
+    return render(request, 'professor_posts_add', context)
+
+@login_required
+def student_posts_view(request, pk):
+    if request.user.role.name != "Student":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    posts = Post.objects.filter(course=pk)
+    print(posts)
+    context = {
+        'posts': posts,
+        'user' : request.user,
+    }
+    return render(request, 'student_posts', context)
+
+@login_required
+def student_courses_view(request):
+    print(request)
+    if request.user.role.name != "Student":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    enrollment = Enrollment.objects.filter(user=request.user.pk)
+    courses_filtered= set()
+    for enroll in enrollment:
+        courses_filtered.add(enroll.course)
+    context = {
+        'courses': courses_filtered,
+        'title': str(request.user.email),
+    }
+    return render(request, 'student_courses', context)
