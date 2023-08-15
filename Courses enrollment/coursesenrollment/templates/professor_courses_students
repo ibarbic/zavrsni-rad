@@ -27,7 +27,7 @@
                 {% for user in users %}
                     {% if user.role.name == "Student" %}
                         <tr>
-                            <td><a id="user" href="{% url 'student' user.id %}"><p>{{ user.email }}</p></a></td>
+                            <td><a id="user" href="{% url 'professor_index' user.id %}"><p>{{ user.email }}</p></a></td>
                             {%if user.status == "regular" %}
                                 <td><p>Redovan</p></td>
                             {% endif %}

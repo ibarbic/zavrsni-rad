@@ -41,5 +41,8 @@ urlpatterns = [
     path('admin_posts_add/<int:pk>', admin_posts_add_view, name='admin_posts_add'),
     path('student_posts/<int:pk>', student_posts_view, name='student_posts'),
     path('student_courses/', student_courses_view, name='student_courses'),
+    path('student_index/<int:pk>', student_index_view, name='student_index'),
+    path('professor_index/<int:pk>/', professor_index_view, name='professor_index'),
+    path('professor_grade_edit/<int:pk>/', professor_grade_edit_view, name='professor_grade_edit'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

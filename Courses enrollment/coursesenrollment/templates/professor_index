@@ -1,0 +1,41 @@
+{% extends "admin" %}
+{% block professor_content %}
+<style>
+    p {text-align: center;}
+    
+</style> 
+        <div class="user-list">
+            <p>{{ student.first_name }} {{student.surname}}</p>
+            <table>
+                <tr>
+                    <th>Predmet</th>
+                    <th>Ocjena</th>
+                    <th>Semestar</th>
+                </tr>
+                {% for enroll in enrollment %}
+                    {% if enroll.course.professor == user %}
+                        <tr>
+                            <td><a id="user" href="{% url 'professor_posts' enroll.course.id %}" ><p>{{ enroll.course.name }}</p></a></td>
+                            <td><p>{{ enroll.grade }}</p></td>
+                            {% if student.status == "regular" %}
+                                <td><p>{{ enroll.course.semester_regular }}</p></td>
+                            {% endif %}
+                            {% if student.status == "part time" %}
+                            <td><p>{{ enroll.course.semester_part_time }}</p></td>
+                            {% endif %}
+                            
+                                
+                                <td><a id="user" href="{% url 'professor_grade_edit' enroll.id %}" ><p>Izmjeni ocjenu</p></a></td>
+                            </td>
+                        </tr>
+                    {% endif %}
+                {% endfor %}
+            
+                
+
+
+            </table>
+        </div>
+
+
+{% endblock professor_content %}

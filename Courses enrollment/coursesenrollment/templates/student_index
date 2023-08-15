@@ -1,0 +1,36 @@
+{% extends "admin" %}
+{% block professor_content %}
+    <div class="user-list-menu">
+        <a class="user-menu-selected" href="{%url 'student_index' 1 %}">1.Semestar</a>
+        <a class="user-menu-default" href="{%url 'student_index' 2 %}">2.Semestar</a>
+        <a class="user-menu-selected" href="{%url 'student_index' 3 %}">3.Semestar</a>
+        <a class="user-menu-default" href="{%url 'student_index' 4 %}">4.Semestar</a>
+        <a class="user-menu-selected" href="{%url 'student_index' 5 %}">5.Semestar</a>
+        <a class="user-menu-default" href="{%url 'student_index' 6 %}">6.Semestar</a>
+        {% if user.status == "part time" %}
+            <a class="user-menu-selected" href="{%url 'student_index' 7 %}">7.Semestar</a>
+            <a class="user-menu-default" href="{%url 'student_index' 8 %}">8.Semestar</a>
+        {% endif %}
+    </div>
+        <div class="user-list">
+            <table>
+                <th colspan = "2">
+                    Semestar {{number}}
+                </th>
+                <tr>
+                    <th>Predmet</th>
+                    <th>Ocjena</th>
+                </tr>
+                {% for enroll in enrollment %}
+                        <tr>
+                            <td><a id="user" href="{% url 'student_posts' enroll.course.id %}" ><p>{{ enroll.course.name }}</p></a></td>
+                            <td><p>{{ enroll.grade }}</p></td>
+                        </tr>
+                {% endfor %}
+            
+                
+
+
+            </table>
+        </div>
+{% endblock professor_content %}

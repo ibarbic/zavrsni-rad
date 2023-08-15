@@ -7,7 +7,7 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, TemplateView, UpdateView
 from .models import CustomUser, Course, Enrollment,Post
-from .forms import StudentForm, UserRegisterForm, UserAuthenticationForm, CourseForm, PostForm, ProfessorPostForm
+from .forms import StudentForm, UserRegisterForm, UserAuthenticationForm, CourseForm, PostForm, ProfessorPostForm,ProfessorIndexForm
 
 def home_view(request):
     user = request.user      
@@ -773,3 +773,72 @@ def student_courses_view(request):
         'title': str(request.user.email),
     }
     return render(request, 'student_courses', context)
+
+@login_required
+def student_index_view(request, pk):
+    if request.user.role.name != "Student":
+        return HttpResponseRedirect(reverse('home'))
+    print(request.user.status)
+    context = {}
+    enrollment = Enrollment.objects.filter(user=request.user.pk)
+    enrollment_filtered= set()
+    if(request.user.status == "regular"):
+        for enroll in enrollment:
+            if (enroll.course.semester_regular == pk):
+                enrollment_filtered.add(enroll)
+    if(request.user.status == "part time"):
+        for enroll in enrollment:
+            if (enroll.course.semester_part_time == pk):
+                enrollment_filtered.add(enroll)
+    context = {
+        'enrollment': enrollment_filtered,
+        'title': str(request.user.email),
+        'number' : pk,
+        'user' : request.user,
+    }
+    return render(request, 'student_index', context)
+
+@login_required
+def professor_index_view(request, pk):
+    if request.user.role.name != "Professor":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    user = CustomUser.objects.get(pk=pk)
+    print(user.first_name)
+    enrollment = Enrollment.objects.all()
+    enrollment_filtered= set()
+    for enroll in enrollment:
+        if (enroll.course.professor == request.user and enroll.user.pk == pk):
+            enrollment_filtered.add(enroll)
+
+    context = {
+        'enrollment': enrollment_filtered,
+        'title': str(request.user.email),
+        'student' : user,
+        'user' : request.user,
+    }
+    return render(request, 'professor_index', context)
+
+@login_required
+def professor_grade_edit_view(request, pk):
+    if request.user.role.name != "Professor":
+        return HttpResponseRedirect(reverse('home'))
+    enroll = Enrollment.objects.get(pk=pk)
+    user = enroll.user
+    context = {}
+    if request.method == 'POST':
+        print(user.email)
+        form = ProfessorIndexForm(request.POST, instance=enroll)
+        if form.is_valid():
+            form.save()
+            return HttpResponseRedirect(reverse('professor_courses'))
+        else:
+            context['grade_edit_form'] = form
+    else:
+        form = ProfessorIndexForm(instance=enroll)
+        context['grade_edit_form'] = form
+    context['student'] = user
+    context['title'] = str(request.user.email)
+    context['course'] = enroll.course
+
+    return render(request, 'professor_grade_edit', context)

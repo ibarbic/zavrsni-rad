@@ -20,6 +20,8 @@
                         <td><p>{{ course.code }}</p></td>
                         <td><a id="predmet" href="{% url 'student_posts' course.pk %}"><p>{{ course.name }}</p></a></td>
                     </tr>
+                    {%if student.status = "regular"%}
+                        course.sem
                 {% endfor %}
                 </table>
             </form>
