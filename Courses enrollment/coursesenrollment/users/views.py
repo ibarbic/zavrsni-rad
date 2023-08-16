@@ -99,9 +99,9 @@ def student_view_pk(request, pk):
     enrollment_filtered = set()
     courses_filtered = set()
     counter_regular = 0
-    counter_parttime = 0
-    redovni_polozeni = 0
-    izvanredni_polozeni = 0
+    counter_part_time = 0
+    regular_pass = 0
+    part_time_pass = 0
     if request.user.role.name == "Student" and request.user.pk != user.pk:
         return HttpResponseRedirect(reverse('home'))
 
@@ -110,12 +110,11 @@ def student_view_pk(request, pk):
         if course.semester_regular == 1 or course.semester_regular == 2:
             counter_regular = counter_regular + 1
         if course.semester_part_time == 3 or course.semester_part_time == 4:
-            counter_parttime = counter_parttime + 1
+            counter_part_time = counter_part_time + 1
         for enroll in enrollment:
             if course.id == course.pk and user.id == enroll.course.pk:
                 enrollment_filtered.add(course)
                 flag = False
-
         if flag:
             enrollment_filtered.add(course)
             courses_filtered.add(course)
@@ -197,21 +196,21 @@ def student_view_pk(request, pk):
             temp_course = Course.objects.get(pk=enroll.course.pk)
             # print(temp_predmet.sem_redovni)
             if enroll.user.pk == user.pk and (temp_course.semester_regular == 1 or temp_course.semester_regular == 2) and enroll.status_choices == "Fail":
-                redovni_polozeni = redovni_polozeni + 1
+                regular_pass = regular_pass + 1
     else:
         for enroll in enrollment:
             temp_course = Course.objects.get(pk=enroll.course.pk)
             if enroll.user.pk == user.pk and (temp_course.semester_part_time == 3 or temp_course.semester_part_time == 4) and enroll.status == "Pass":
-                izvanredni_polozeni = izvanredni_polozeni + 1
+                part_time_pass = part_time_pass + 1
 
     context = {
         'user': user,
         'courses': courses_filtered,
         'enrollment': enrollment_html,
         'title': user.email,
-        'regular_pass': redovni_polozeni,
+        'regular_pass': regular_pass,
         'counter_regular': counter_regular,
-        'part_time': counter_parttime,
+        'part_time': counter_part_time,
     }
 
 
@@ -825,11 +824,17 @@ def professor_grade_edit_view(request, pk):
         return HttpResponseRedirect(reverse('home'))
     enroll = Enrollment.objects.get(pk=pk)
     user = enroll.user
+    if (enroll.grade > 1):
+        enroll.status = "Pass"
     context = {}
     if request.method == 'POST':
         print(user.email)
         form = ProfessorIndexForm(request.POST, instance=enroll)
         if form.is_valid():
+            if (enroll.grade > 1):
+                enroll.status = "Pass"
+            if (enroll.grade == 1):
+                enroll.status = "Fail"
             form.save()
             return HttpResponseRedirect(reverse('professor_courses'))
         else:
@@ -842,3 +847,37 @@ def professor_grade_edit_view(request, pk):
     context['course'] = enroll.course
 
     return render(request, 'professor_grade_edit', context)
+
+@login_required
+def professor_statistic_view(request, pk):
+    if request.user.role.name != "Professor":
+        return HttpResponseRedirect(reverse('home'))
+    context = {}
+    course = Course.objects.get(pk=pk)
+    enrollment = Enrollment.objects.filter(course = course)
+    enrollment_filtered= set()
+    user_fail=0
+    user_pass=0
+    user_drop_out=0
+    counter = 0
+    grade = 0
+    for enroll in enrollment:
+        if(enroll.status == "Pass"):
+            user_pass = user_pass +1
+        if(enroll.status == "Fail"):
+            user_fail = user_fail +1
+        if(enroll.status == "Dropped"):
+            user_drop_out = user_drop_out +1
+        if(enroll.status == "Enrolled"):
+            user_enroll = user_enroll +1
+        counter = counter +1
+        grade = grade + enroll.grade
+        grade = grade / counter
+    context = {
+        'course': course,
+        'user_pass' : user_pass,
+        'user_fail' : user_fail,
+        'user_enroll' : counter,
+        'grade' : grade,
+    }
+    return render(request, 'professor_statistic', context)

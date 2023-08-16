@@ -1,0 +1,32 @@
+{% extends "professor" %}
+
+{% block professor_content %}
+<style>
+    p {text-align: center;}
+    
+</style>
+<div class="user-list">
+    <table>
+        <th colspan = "4">
+            {{course.name}}
+        </th>
+        <tr>
+            <th>Broj Upisanih</th>
+            <th>Prosjecna Ocjena</th>
+            <th>Broj studenta koji su pali</th>
+            <th>Broj studenta koji su prosli</th>
+        </tr>
+                <tr>
+                    <td><a id="user" ><p>{{ user_enroll}}</p></a></td>
+                    <td><p>{{ grade }}</p></td>
+                    <td><p>{{ user_fail }}</p></td>
+                    <td><p>{{ user_pass }}</p></td>
+                </tr>
+
+    
+        
+
+
+    </table>
+</div>
+{% endblock professor_content %}

@@ -7,7 +7,7 @@ from django.conf import settings
 from django.conf.urls.static import static
 
 urlpatterns = [
-    #path('admin/', admin.site.urls),
+    path('superadmin/', admin.site.urls),
     path('admin/', admin_view, name='admin'),
     path('admin_courses_add/', admin_courses_add_view, name='admin_courses_add'),
     path('admin_courses/', admin_courses_view, name='admin_courses'),
@@ -44,5 +44,6 @@ urlpatterns = [
     path('student_index/<int:pk>', student_index_view, name='student_index'),
     path('professor_index/<int:pk>/', professor_index_view, name='professor_index'),
     path('professor_grade_edit/<int:pk>/', professor_grade_edit_view, name='professor_grade_edit'),
+    path('professor_statistic/<int:pk>/', professor_statistic_view, name='professor_statistic'),
     path('ckeditor/', include('ckeditor_uploader.urls')),
 ]+ static(settings.MEDIA_URL, document_root = settings.MEDIA_ROOT)

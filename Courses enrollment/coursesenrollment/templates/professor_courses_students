@@ -31,7 +31,7 @@
                             {%if user.status == "regular" %}
                                 <td><p>Redovan</p></td>
                             {% endif %}
-                            {% if user.status == "partTime" %}
+                            {% if user.status == "part time" %}
                                 <td><p>Izvanredan</p></td>
                             {% endif %}
                         </tr>

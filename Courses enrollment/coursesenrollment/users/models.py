@@ -27,6 +27,7 @@ class CustomUser(AbstractBaseUser):
     telephone_number= models.CharField(max_length=15,default="")
     address = models.CharField(max_length=128, default="")
     role = models.ForeignKey(Role, on_delete=models.CASCADE, default=3)
+    student_number =models.CharField(max_length=128, default="")
     status = models.CharField(max_length=10, default="none")
     username = models.CharField(max_length=30)
     date_joined = models.DateTimeField(
@@ -83,6 +84,8 @@ class Enrollment(models.Model):
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     course = models.ForeignKey(Course, on_delete=models.CASCADE)
     grade = models.IntegerField(blank=False, default= 1, validators=[MaxValueValidator(5), MinValueValidator(1)])
+    date = models.DateTimeField(auto_now_add=True, blank=True)
+    enroll_times = models.IntegerField(blank=False, default= 1)
     FAIL = "Fail"
     PASS = "Pass"
     DROPPED = "Dropped"

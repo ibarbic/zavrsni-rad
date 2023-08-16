@@ -19,7 +19,7 @@
                     <tr>
                         <td><p>{{ course.code }}</p></td>
                         <td><a id="predmet" href="{% url 'professor_courses_students' course.id %}"><p>{{ course.name }}</p></a></td>
-                   
+                        <td><a id="predmet" href="{% url 'professor_statistic' course.id %}"><p>Statistica predmeta</p></a></td>
                     </tr>
                 {% endfor %}
                 </table>
