@@ -14,7 +14,7 @@
                 <th>Status</th>
             </tr>
             {% for user in users %}
-                {% if user.status == "partTime" and user.role.name == "Student" %}
+                {% if user.status == "part time" and user.role.name == "Student" %}
                     <tr>
                         <td><a id="user" href="{% url 'student' user.id %}"><p>{{ user.email }}</p></a></td>
                         <td><p>{{ user.status }}</p></td>

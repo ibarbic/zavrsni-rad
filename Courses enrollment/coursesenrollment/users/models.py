@@ -108,6 +108,7 @@ class Post(models.Model):
     content = RichTextField()
     created_on = models.DateTimeField(auto_now_add=True)
     updated_on = models.DateTimeField(auto_now=True)
+    initials = models.CharField(max_length=128, default="")
     
     class Meta:
         db_table = "posts"

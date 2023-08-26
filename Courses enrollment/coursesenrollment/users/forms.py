@@ -92,6 +92,7 @@ class StudentForm(forms.ModelForm):
 class CourseModelChoiceField(forms.ModelChoiceField):
     def label_from_instance(self, obj):
         return "%s" % (obj.name)          
+
 class PostForm(forms.ModelForm):
     title = forms.CharField(max_length=64, label= "Naslov")
     content = forms.CharField(label="Sadrzaj", widget=CKEditorWidget())

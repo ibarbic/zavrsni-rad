@@ -3,16 +3,16 @@
 {% block content %}
 {% load static %} 
 {% load crispy_forms_tags %}
-    <div id="home-container">
-        <h1>Home</h1>
-        {% for user in users %}
-                    
-                        <tr>
-                            <td><a id="user" href="{% url 'student' user.id %}"><p>{{ user.email }}</p></a></td>
-                            {print(user.id)}
-                        </tr>
-                    
-                {% endfor %}
-    </div>
+<div id="home-container">
+    <h1>Home</h1>
+    {% for user in users %}
+                
+                    <tr>
+                        <td><a id="user" href="{% url 'student' user.id %}"><p>{{ user.email }}</p></a></td>
+                        {print(user.id)}
+                    </tr>
+                
+    {% endfor %}
+</div>
 
 {% endblock content %}

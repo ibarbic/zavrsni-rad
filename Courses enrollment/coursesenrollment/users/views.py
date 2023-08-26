@@ -8,12 +8,12 @@ from django.contrib.auth.decorators import login_required
 from django.views.generic import ListView, DetailView, TemplateView, UpdateView
 from .models import CustomUser, Course, Enrollment,Post
 from .forms import StudentForm, UserRegisterForm, UserAuthenticationForm, CourseForm, PostForm, ProfessorPostForm,ProfessorIndexForm
+from datetime import datetime
 
 def home_view(request):
     user = request.user      
     if  request.user.is_anonymous:
-        print(user)
-        return HttpResponseRedirect(reverse('home'))
+        return render(request, 'home')
     else:
         if user:
                 if(user.role.name == "Professor"):
@@ -22,9 +22,8 @@ def home_view(request):
                     return HttpResponseRedirect(reverse('admin'))
                     #return HttpResponseRedirect(reverse('home'))
                 elif(user.role.name == "Student"):
-                    return HttpResponseRedirect('/student/' + str(user.pk) + '/')
-    
-        
+                    #return HttpResponseRedirect('/student/' + str(user.pk) + '/')  
+                    return HttpResponseRedirect(reverse('student_courses'))
     return HttpResponseRedirect(reverse('login'))
 def registration_view(request):
     context = {}
@@ -81,7 +80,8 @@ def login_view(request):
                     return HttpResponseRedirect(reverse('admin'))
                     #return HttpResponseRedirect(reverse('home'))
                 elif(user.role.name == "Student"):
-                     return HttpResponseRedirect('/student/' + str(user.pk) + '/')
+                    #return HttpResponseRedirect('/student/' + str(user.pk) + '/')
+                    return HttpResponseRedirect(reverse('student_courses'))
                 return HttpResponseRedirect(reverse('home'))
     else:
         form = UserAuthenticationForm()
@@ -605,28 +605,29 @@ def admin_courses_edit_view(request, pk):
 
     return render(request, 'admin_courses_edit', context)
 
-# def admin_posts_view(request, pk):
-#     posts = Post.objects.filter(course = pk)
-#     print(posts)
-#     return render(request, 'admin_posts', {'posts': posts, })
+
 @login_required
 def admin_posts_view(request, pk):
     if request.user.role.name != "Admin":
         return HttpResponseRedirect(reverse('home'))
     context = {}
-    
+    course = Course.objects.get(pk=pk)
     posts = Post.objects.filter(course=pk)
+    for post in posts:
+        temp = post.user.first_name[:1] + post.user.surname[:1] 
+        post.initials = temp.upper() 
     if request.POST:
         for post in posts:
             print(post)
             if request.POST.get(str(post)) == 'delete':
                 messages.success(request, "Izbrisano: " + str(post.title))
                 post.delete()
-                return HttpResponseRedirect(reverse('admin_posts', args= pk,))
+                return HttpResponseRedirect(reverse('admin_posts', args= (pk,)))
             elif request.POST.get(str(post)) == 'edit':
                 return HttpResponseRedirect(reverse('admin_posts_edit', args=(post.pk,)))
     context = {
         'posts': posts,
+        'course': course,
     }
     return render(request, 'admin_posts', context)
 
@@ -681,6 +682,9 @@ def professor_posts_view(request, pk):
     context = {}
     course = Course.objects.filter(pk=pk)
     posts = Post.objects.filter(course=pk)
+    for post in posts:
+        temp = post.user.first_name[:1] + post.user.surname[:1] 
+        post.initials = temp.upper() 
     if request.POST:
         if(course[0].professor.pk == request.user.pk):
             for post in posts:
@@ -688,13 +692,14 @@ def professor_posts_view(request, pk):
                 if request.POST.get(str(post)) == 'delete':
                     messages.success(request, "Izbrisano: " + str(post.title))
                     post.delete()
-                    return HttpResponseRedirect(reverse('admin_posts', args= pk,))
+                    return HttpResponseRedirect(reverse('professor_posts', args= (pk,)))
                 elif request.POST.get(str(post)) == 'edit':
-                    return HttpResponseRedirect(reverse('admin_posts_edit', args=(post.pk,)))
+                    return HttpResponseRedirect(reverse('professor_posts_edit', args=(post.pk,)))
     context = {
         'posts': posts,
         'professor' : course[0].professor,
         'user' : request.user,
+        'course': pk,
     }
     return render(request, 'professor_posts', context)
 
@@ -723,26 +728,49 @@ def professor_posts_edit_view(request, pk):
     return render(request, 'professor_post_edit', context)
 
 @login_required
-def professor_posts_add_view(request,pk):
+def professor_posts_add_view(request):
     if request.user.role.name != "Professor":
         return HttpResponseRedirect(reverse('home'))
     context = {}
     if request.method == 'POST':
-        form = ProfessorPostForm(request.POST)
+        form = PostForm(request.POST)
+        form.fields['course'].queryset = Course.objects.filter(professor=request.user)
         if form.is_valid():
-            tempform = form.save(commit=False)
-            tempform.user = request.user
-            tempform.save()
+            tempForm = form.save(commit=False)
+            tempForm.user = request.user
+            tempForm.save()
             messages.success(request, f'Post has been created!')
             return HttpResponseRedirect(reverse('professor_courses'))
         else:
             context['post_add_form'] = form
     else:
-        form = ProfessorPostForm(request=request)
+        form = PostForm()
         context['post_add_form'] = form
     context['title'] = str(request.user.email)
 
     return render(request, 'professor_posts_add', context)
+# @login_required
+# def professor_posts_add_view(request,pk):
+#     if request.user.role.name != "Professor":
+#         return HttpResponseRedirect(reverse('home'))
+#     context = {}
+#     if request.method == 'POST':
+#         form = ProfessorPostForm(request.POST)
+#         form.fields['course'].queryset = Course.objects.filter(professor=request.user)
+#         if form.is_valid():
+#             tempform = form.save(commit=False)
+#             tempform.user = request.user
+#             tempform.save()
+#             messages.success(request, f'Post has been created!')
+#             return HttpResponseRedirect(reverse('professor_courses'))
+#         else:
+#             context['post_add_form'] = form
+#     else:
+#         form = ProfessorPostForm(request=request)
+#         context['post_add_form'] = form
+#     context['title'] = str(request.user.email)
+
+#     return render(request, 'professor_posts_add', context)
 
 @login_required
 def student_posts_view(request, pk):
@@ -750,7 +778,9 @@ def student_posts_view(request, pk):
         return HttpResponseRedirect(reverse('home'))
     context = {}
     posts = Post.objects.filter(course=pk)
-    print(posts)
+    for post in posts:
+        temp = post.user.first_name[:1] + post.user.surname[:1] 
+        post.initials = temp.upper() 
     context = {
         'posts': posts,
         'user' : request.user,
